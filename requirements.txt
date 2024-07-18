@@ -1,0 +1,3 @@
+transformers
+plotly-express
+streamlit
