@@ -2,11 +2,16 @@
 MODEL=~/models/L3-8B-Celeste-v1.Q6_K.gguf
 TOKENIZER=nothingiisreal/L3-8B-Celeste-v1
 PROMPT=roleplay.txt
-LLAMA_CPP_PATH=./
+LLAMA_CPP_PATH=./build
 LLAMA_CPP_ARGS="-ngl 99 -fa --temp 0 --top-k 0 --top-p 1.0 --min-p 0.0"
-CONTEXT_LENGTH=1024
-GENERATION_LENGTH=1024
+CONTEXT_LENGTH=4096
+GENERATION_LENGTH=4096
 BIASES="--ignore-eos"
+
+# build?
+if [ ! -e $LLAMA_CPP_PATH/llama-cli ]; then
+  source build.sh
+fi
 
 # make logs dir
 mkdir -p logs

@@ -1,0 +1,29 @@
+diff --git a/common/common.cpp b/common/common.cpp
+index dbb724fb..30c3a928 100644
+--- a/common/common.cpp
++++ b/common/common.cpp
+@@ -2097,9 +2097,11 @@ std::tuple<struct llama_model *, struct llama_context *> llama_init_from_gpt_par
+         llama_lora_adapter_set(lctx, adapter, lora_scale);
+     }
+ 
++/*
+     if (params.ignore_eos) {
+         params.sparams.logit_bias[llama_token_eos(model)] = -INFINITY;
+     }
++*/
+ 
+     if (params.warmup) {
+         LOG("warming up the model with an empty run\n");
+diff --git a/examples/main/main.cpp b/examples/main/main.cpp
+index a0d817b1..95aa49d7 100644
+--- a/examples/main/main.cpp
++++ b/examples/main/main.cpp
+@@ -957,7 +957,7 @@ int main(int argc, char ** argv) {
+         }
+ 
+         // end of generation
+-        if (!embd.empty() && llama_token_is_eog(model, embd.back()) && !(params.interactive)) {
++        if (!embd.empty() && llama_token_is_eog(model, embd.back()) && !(params.interactive) && !(params.ignore_eos)) {
+             LOG_TEE(" [end of text]\n");
+             break;
+         }
