@@ -2,6 +2,7 @@ import requests
 import time
 import json
 import sys
+import random
 
 def stream_response(llm, prompt, max_tokens = 2048):
     data = {
@@ -62,22 +63,25 @@ if __name__ == "__main__":
 
     prompt = config['prefix'] + config['system']
     for idx, entry in enumerate(config['example']):
-        prompt += config['sot'].replace('{role}', entry['role']) + entry['text']
-        if idx != len(config['example']) -1: prompt += config['eot']
+        prompt += config['sot'].replace('{role}', entry['role']) + entry['text'] + config['eot']
         
     total_tokens = 0
-    next_role = config['first_role']
-    
+   
     while total_tokens < config.get('total_tokens', 2048):    
+        
+        # reply as user
+        user_message = random.choice(config['user_replies'])
+        prompt += config['sot'].replace('{role}', 'user') + config['user_prefix'] + user_message + config['eot']
+        
+        # now asisstant
+        prompt += config['sot'].replace('{role}', 'assistant')
+        
         print("---\n")
         print(prompt, end='<END_OF_PROMPT>')
         completion, tokens, _, _ = stream_response(llm, prompt, config.get('turn_max_tokens', 512))
         
         total_tokens += tokens
         prompt += completion + config['eot']
-        prompt += config['sot'].replace('{role}', next_role)
-        if next_role == 'user': prompt += 'User:'
-        next_role = 'user' if next_role == 'assistant' else 'assistant'
         
         print(f"\n\ntotal_tokens = {total_tokens}")
 
