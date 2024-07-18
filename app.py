@@ -5,10 +5,6 @@ from transformers import AutoTokenizer
 import argparse
 import sys
 
-def load_yaml(file_path):
-    with open(file_path, 'r') as file:
-        return yaml.safe_load(file)
-
 def create_histogram(data, tokenizer):
     token_counts = {}
     for token in data['output_tokens']:
@@ -40,7 +36,13 @@ def main():
     
     st.set_page_config(page_title='Broken Record: LLM Repetition Analyzer', layout='wide')
     
-    data = load_yaml(args.yaml_path)
+    # llama.cpp often does not produce actually correct YAML
+    with open(args.yaml_path) as f:
+        lines = f.readlines()
+        for line in lines:
+            if 'output_tokens' in line:
+                yaml_data = line
+    data = yaml.safe_load(yaml_data)
     tokenizer = AutoTokenizer.from_pretrained(args.tokenizer_name)
     
     fig = create_histogram(data, tokenizer)

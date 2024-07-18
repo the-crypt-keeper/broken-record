@@ -1,12 +1,12 @@
 # parameters
 MODEL=~/models/L3-8B-Celeste-v1.Q6_K.gguf
 TOKENIZER=nothingiisreal/L3-8B-Celeste-v1
-PROMPT=prompt.txt
+PROMPT=roleplay.txt
 LLAMA_CPP_PATH=./
 LLAMA_CPP_ARGS="-ngl 99 -fa --temp 0 --top-k 0 --top-p 1.0 --min-p 0.0"
 CONTEXT_LENGTH=1024
 GENERATION_LENGTH=1024
-BIASES="--logit-bias 128009-inf"
+BIASES="--ignore-eos"
 
 # make logs dir
 mkdir -p logs
