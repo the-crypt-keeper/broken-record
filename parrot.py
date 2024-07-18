@@ -57,17 +57,19 @@ if __name__ == "__main__":
         
     llm = {'api_url': config['api_url'] }
     llm['model'] = requests.get(llm['api_url']+'/v1/models').json()['data'][0]['id']
-    
+
+    user_llm = {'api_url': config['user_api_url'] }
+    user_llm['model'] = requests.get(user_llm['api_url']+'/v1/models').json()['data'][0]['id']
+        
     tokenizer = AutoTokenizer.from_pretrained(config['tokenizer'])
 
     conversation = config['conversation']
     total_tokens = 0
    
     while total_tokens < config.get('total_tokens', 2048):
-        prompt = tokenizer.apply_chat_template(conversation, bos_token='', tokenize=False, add_generation_prompt=True)
-        
+        prompt = tokenizer.apply_chat_template(conversation, bos_token='', tokenize=False, add_generation_prompt=True)        
         print(f"\n--- {total_tokens} ---\n")
-        print(prompt)
+        print(prompt, end='')
         
         completion, tokens, _, _ = stream_response(llm, prompt, config.get('sampler'), config.get('turn_max_tokens', 512))        
         total_tokens += tokens        
@@ -76,13 +78,17 @@ if __name__ == "__main__":
         user_messages = [
             {"role": "system", "content": config["user_system"]}
         ]
-        for msg in conversation[-3:]:
+        for msg in conversation[-5:]:
             if msg["role"] == "user":
                 user_messages.append({"role": "assistant", "content": msg["content"]})
             elif msg["role"] == "assistant":
                 user_messages.append({"role": "user", "content": msg["content"]})
         user_prompt = tokenizer.apply_chat_template(user_messages, bos_token='', tokenize=False, add_generation_prompt=True) + config['user_prefix']
-        user_text, tokens, _, _ = stream_response(llm, user_prompt, config.get('sampler'), config.get('turn_max_tokens', 512))        
+        print(user_prompt, end='')
+        user_text, tokens, _, _ = stream_response(user_llm, user_prompt, config.get('sampler'), config.get('turn_max_tokens', 512))        
 
         total_tokens += tokens
         conversation += [{"role": "user", "content": config["user_prefix"] + user_text}]
+
+    print(f"\n--- {total_tokens} ---\n")
+    print(tokenizer.apply_chat_template(conversation, bos_token='', tokenize=False))
