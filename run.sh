@@ -5,7 +5,7 @@ PROMPT=roleplay.txt
 LLAMA_CPP_PATH=./build
 LLAMA_CPP_ARGS="-ngl 99 -fa --temp 0 --top-k 0 --top-p 1.0 --min-p 0.0"
 CONTEXT_LENGTH=4096
-GENERATION_LENGTH=4096
+GENERATION_LENGTH=2048
 BIASES="--ignore-eos"
 
 # build?
