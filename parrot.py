@@ -66,14 +66,12 @@ if __name__ == "__main__":
     while total_tokens < config.get('total_tokens', 2048):
         prompt = tokenizer.apply_chat_template(conversation, bos_token='', tokenize=False, add_generation_prompt=True)
         
-        print("---")
+        print(f"\n--- {total_tokens} ---\n")
         print(prompt)
         
         completion, tokens, _, _ = stream_response(llm, prompt, config.get('sampler'), config.get('turn_max_tokens', 512))        
-        total_tokens += tokens
-        
+        total_tokens += tokens        
         conversation += [{"role": "assistant", "content": completion}]       
-        print(f"\n\ntotal_tokens = {total_tokens}")
         
         user_messages = [
             {"role": "system", "content": config["user_system"]}
@@ -86,4 +84,5 @@ if __name__ == "__main__":
         user_prompt = tokenizer.apply_chat_template(user_messages, bos_token='', tokenize=False, add_generation_prompt=True) + config['user_prefix']
         user_text, tokens, _, _ = stream_response(llm, user_prompt, config.get('sampler'), config.get('turn_max_tokens', 512))        
 
+        total_tokens += tokens
         conversation += [{"role": "user", "content": config["user_prefix"] + user_text}]

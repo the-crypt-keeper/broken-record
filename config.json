@@ -6,7 +6,7 @@
         { "role": "user", "content": "Mark: Hey Skye, I'm doing pretty good. Thanks for asking! *Mark smiles and tries to be friendly with Skye*" }
     ],
 
-    "total_tokens": 3072,
+    "total_tokens": 8192,
     "turn_max_tokens": 512,
     "sampler": {
         "temperature": 0.87,
