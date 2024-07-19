@@ -1,7 +1,5 @@
 # Configuration Documentation
 
-This document describes the configuration options in `config.json` for the parrot.py script.
-
 ## General Settings
 
 - `conversation`: An array of initial conversation messages to start the dialogue.
