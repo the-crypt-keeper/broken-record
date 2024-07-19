@@ -2,7 +2,7 @@
 
 ## Overview
 
-Parrot is a powerful tool designed for generating synthetic deep-roleplay dialogues using advanced language models. It simulates conversations between two characters, allowing for the creation of rich, interactive narratives.
+Parrot is a powerful tool designed for generating synthetic deep-roleplay dialogues using advanced language models. It simulates conversations between two characters, allowing for the creation of rich, interactive narratives and enable investigation into LLM conversation looping behaviors.
 
 ## Features
 
@@ -17,18 +17,17 @@ Parrot is a powerful tool designed for generating synthetic deep-roleplay dialog
 1. `parrot.py`: The main Python script that handles the dialogue generation.
 2. `parrot.sh`: A Bash script for running multiple iterations of the dialogue generation.
 3. `config.json`: Configuration file for setting up the dialogue parameters.
-4. `CONFIG.md`: Detailed documentation of the configuration file format.
 
 ## Usage
 
 1. Set up your configuration in `config.json`. Refer to [CONFIG.md](CONFIG.md) for detailed information on the configuration options.
 
-2. Run a single iteration:
+2. Run a single iteration for testing:
    ```
    python parrot.py
    ```
 
-3. Run multiple iterations using the bash script:
+3. Run multiple iterations with logging using the bash script:
    ```
    ./parrot.sh <number_of_iterations>
    ```
@@ -55,12 +54,4 @@ For a complete breakdown of the configuration options, please refer to [CONFIG.m
 
 ## License
 
-[Specify your license here]
-
-## Contributing
-
-[Add contribution guidelines if applicable]
-
-## Support
-
-[Provide contact information or support channels]
+[MIT](LICENSE.md)
