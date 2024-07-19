@@ -12,7 +12,7 @@ def stream_response(llm, prompt, sampler, max_tokens = 2048):
         "prompt": prompt,
         "n_predict": max_tokens,
         "stream": True,
-        "use_cache": True,
+        "cache_prompt": True,
         **sampler
     }
     
@@ -67,18 +67,18 @@ if __name__ == "__main__":
     total_tokens = 0
    
     while total_tokens < config.get('total_tokens', 2048):
-        prompt = tokenizer.apply_chat_template(conversation, bos_token='', tokenize=False, add_generation_prompt=True)        
+        prompt = tokenizer.apply_chat_template(conversation, bos_token='', tokenize=False, add_generation_prompt=True) + config['agent_prefix']
         print(f"\n--- {total_tokens} ---\n")
         print(prompt, end='')
         
         completion, tokens, _, _ = stream_response(llm, prompt, config.get('sampler'), config.get('turn_max_tokens', 512))        
-        total_tokens += tokens        
-        conversation += [{"role": "assistant", "content": completion}]       
+        total_tokens += tokens
+        conversation += [{"role": "assistant", "content": config['agent_prefix']+completion}]
         
         user_messages = [
             {"role": "system", "content": config["user_system"]}
         ]
-        for msg in conversation[-5:]:
+        for msg in conversation[-9:]:
             if msg["role"] == "user":
                 user_messages.append({"role": "assistant", "content": msg["content"]})
             elif msg["role"] == "assistant":
