@@ -19,11 +19,11 @@
         "min_p": 0.1
     },
 
-    "api_url": "http://127.0.0.1:8081",
-    "tokenizer": "nothingiisreal/L3-8B-Celeste-v1",
+    "api_url": "http://10.0.0.168:8080",
+    "tokenizer": "meta-llama/Meta-Llama-3-8B-Instruct",
 
     "user_api_url": "http://127.0.0.1:8082",
-    "user_tokenizer": "nothingiisreal/L3-8B-Celeste-v1",
+    "user_tokenizer": "meta-llama/Meta-Llama-3-8B-Instruct",
 
     "user_prefix": "Mark: \"",
     "user_system": "Mark and Skye are on a date. They flirt, but nothing more. Mark is shy and introverted, but extremely attracted to Skye.  He is nervous at first but then engages her in conversation, bringing up subjects such as her Volleyball career, her parents, coffee, the weather, other personal questions and general small-talk as he tries to get to know her.",
