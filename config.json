@@ -19,7 +19,7 @@
         "min_p": 0.1
     },
 
-    "api_url": "http://10.0.0.168:8080",
+    "api_url": "http://127.0.0.1:8081",
     "tokenizer": "meta-llama/Meta-Llama-3-8B-Instruct",
 
     "user_api_url": "http://127.0.0.1:8082",

@@ -57,11 +57,9 @@ if __name__ == "__main__":
         
     llm = {'api_url': config['api_url'] }
     llm['model'] = requests.get(llm['api_url']+'/v1/models').json()['data'][0]['id']
-    print(f"Assistant Model: {llm.get('model')}")
 
     user_llm = {'api_url': config['user_api_url'] }
     user_llm['model'] = requests.get(user_llm['api_url']+'/v1/models').json()['data'][0]['id']
-    print(f"User Model: {user_llm.get('model')}")    
         
     tokenizer = AutoTokenizer.from_pretrained(config['tokenizer'])
     user_tokenizer = AutoTokenizer.from_pretrained(config.get('user_tokenizer', config['tokenizer']))
@@ -96,8 +94,13 @@ if __name__ == "__main__":
         conversation += [{"role": "user", "content": config["user_prefix"] + user_text}]
 
     total_tokens = 0
+    print()
+    print("--- DONE ---")
+    print(f"Assistant Model: {llm.get('model')}")
+    print(f"User Model: {user_llm.get('model')}")    
+    print()
     for msg, count in zip(conversation, token_counts):
         print(f'=== {msg.get("role")} @ {total_tokens} ===')
         print(msg['content'])
         total_tokens += count
-    print(f"\n--- {total_tokens} ---\n")        
+    print(f"\n--- {total_tokens} tokens, {len(conversation)} turns ---\n")
