@@ -65,21 +65,21 @@ if __name__ == "__main__":
     user_tokenizer = AutoTokenizer.from_pretrained(config.get('user_tokenizer', config['tokenizer']))
 
     conversation = config['conversation']
-    total_tokens = 0
+    token_counts = [0 for x in range(len(conversation))]    
    
-    while total_tokens < config.get('total_tokens', 2048):
+    while sum(token_counts) < config.get('total_tokens', 2048):
         prompt = tokenizer.apply_chat_template(conversation, bos_token='', tokenize=False, add_generation_prompt=True) + config['agent_prefix']
-        print(f"\n--- {total_tokens} ---\n")
+        print(f"\n--- {sum(token_counts)} ---\n")
         print(prompt, end='')
         
         completion, tokens, _, _ = stream_response(llm, prompt, config.get('sampler'), config.get('turn_max_tokens', 512))        
-        total_tokens += tokens
+        token_counts.append(tokens)
         conversation += [{"role": "assistant", "content": config['agent_prefix']+completion}]
         
         user_messages = [
             {"role": "system", "content": config["user_system"]}
         ]
-        for msg in conversation[-9:]:
+        for msg in conversation[-1*config.get('user_memory',9):]:
             if msg["role"] == "user":
                 user_messages.append({"role": "assistant", "content": msg["content"]})
             elif msg["role"] == "assistant":
@@ -90,10 +90,12 @@ if __name__ == "__main__":
         print(config['user_prefix'], end='')
         user_text, tokens, _, _ = stream_response(user_llm, user_prompt, config.get('sampler'), config.get('turn_max_tokens', 512))        
 
-        total_tokens += tokens
+        token_counts.append(tokens)
         conversation += [{"role": "user", "content": config["user_prefix"] + user_text}]
 
-    print(f"\n--- {total_tokens} ---\n")
-    for msg in conversation:
-        print(f'==={msg.get("role")}===')
+    total_tokens = 0
+    for msg, count in zip(conversation, token_counts):
+        print(f'=== {msg.get("role")} @ {total_tokens} ===')
         print(msg['content'])
+        total_tokens += count
+    print(f"\n--- {total_tokens} ---\n")        
