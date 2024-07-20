@@ -6,6 +6,7 @@ import re
 IGNORED_WORDS = [] #"of","a","at","and","her","his","as","in","that","the","with","","are","to","she","he","for","I","him","says"]
 
 def remove_ngram_from_text(text, ngram):
+    if not ngram in text: print('REMOVE ERROR', ngram)
     return text.replace(ngram, '')
 
 def extract_skye_lines(filename):
