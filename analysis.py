@@ -67,7 +67,7 @@ if __name__ == "__main__":
             text = extract_skye_lines(file_path)
             if text:
                 print(f"\n{filename}")
-                for n in range(32, 3, -1):
+                for n in range(100, 3, -1):
                     common_ngrams, text = find_and_remove_ngrams(text, n)
                     for ngram, count in common_ngrams:
                         print(f"  {ngram} (found {count} times)")
