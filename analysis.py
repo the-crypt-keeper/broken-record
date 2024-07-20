@@ -34,7 +34,7 @@ def extract_skye_lines(filename):
         # Remove "Skye:" from the beginning of each line
         skye_text = re.sub(r"Skye:", "", skye_text)
         
-        # Count words
+        # Count chr
         word_count = len(skye_text.split())
         
         return skye_text.strip(), word_count
@@ -79,7 +79,7 @@ def find_and_remove_ngrams(text, n):
 def display_histogram(density_buckets):
     print("\nHistogram of Loop Densities:")
     for bucket, filenames in density_buckets.items():
-        next_bucket = list(density_buckets.keys())[list(density_buckets.keys()).index(bucket) + 1] if bucket != list(density_buckets.keys())[-1] else "inf"
+        next_bucket = list(density_buckets.keys())[list(density_buckets.keys()).index(bucket) + 1] if bucket != list(density_buckets.keys())[-1] else float("inf")
         print(f"{bucket:.2f}-{next_bucket:.2f}: {'#' * len(filenames)} ({len(filenames)})")
 
 if __name__ == "__main__":
@@ -98,7 +98,13 @@ if __name__ == "__main__":
         (0.1, []),
         (0.2, []),
         (0.3, []),
-        (0.4, [])
+        (0.4, []),
+        (0.5, []),
+        (0.6, []),
+        (0.7, []),
+        (0.8, []),
+        (0.9, []),
+        (1.0, [])
     ])
     
     for filename in os.listdir(folder_path):
@@ -128,7 +134,7 @@ if __name__ == "__main__":
                         density_buckets[bucket].append(filename)
                         break
                 
-                if loop_density > 0.2:
+                if loop_score > 1000 and loop_density > 0.3:
                     for ngram, count in sorted_ngrams[0:20]:
                         print(f"  {ngram} (found {count} times)")
 
