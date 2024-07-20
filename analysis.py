@@ -157,7 +157,7 @@ if __name__ == "__main__":
     
     log_files = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if f.endswith('.log')]
     
-    with ThreadPoolExecutor(max_workers=8) as executor:
+    with ThreadPoolExecutor(max_workers=2) as executor:
         future_to_file = {executor.submit(process_file, file_path): file_path for file_path in log_files}
         
         for future in as_completed(future_to_file):
