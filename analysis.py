@@ -21,7 +21,7 @@ def extract_skye_lines(filename):
             return ""
 
         # Extract lines starting with "Skye:" after the marker
-        skye_lines = [line for line in lines[done_index+1:] if line.startswith("Skye:")]
+        skye_lines = [line.strip() for line in lines[done_index+1:] if line.startswith("Skye:")]
         
         # Join all the lines into a single text block
         skye_text = ' '.join(skye_lines)
@@ -35,7 +35,7 @@ def extract_skye_lines(filename):
         return ""
 
 def find_and_remove_ngrams(text, n):
-    words = text.split()
+    words = text.split(' ')
     ngrams = []
     for i in range(len(words) - n + 1):
         ngram = ' '.join(words[i:i+n])
@@ -46,8 +46,11 @@ def find_and_remove_ngrams(text, n):
     common_ngrams = [(ngram, count) for ngram, count in ngram_counts.items() if count > 1]
     
     for ngram, _ in common_ngrams:
+        old_len = len(text)
         text = remove_ngram_from_text(text, ngram)
-    
+        if len(text) == old_len:
+            print('REMOVE ERROR!', n, ngram)
+            
     return common_ngrams, text
 
 if __name__ == "__main__":
@@ -68,12 +71,12 @@ if __name__ == "__main__":
             if text:
                 print(f"\n{filename}")
                 all_ngrams = []
-                for n in range(100, 3, -1):
+                for n in range(64, 4, -1):
                     common_ngrams, text = find_and_remove_ngrams(text, n)
                     all_ngrams.extend(common_ngrams)
                 
                 # Sort all_ngrams by count in descending order
                 sorted_ngrams = sorted(all_ngrams, key=lambda x: x[1], reverse=True)
                 
-                for ngram, count in sorted_ngrams:
+                for ngram, count in sorted_ngrams[0:20]:
                     print(f"  {ngram} (found {count} times)")
