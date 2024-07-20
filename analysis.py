@@ -10,7 +10,7 @@ def create_length_histogram(lengths, num_buckets=10):
     if not lengths:
         return {}
     
-    min_length = min(lengths)
+    min_length = 0
     max_length = max(lengths)
     bucket_size = (max_length - min_length) / num_buckets
     
