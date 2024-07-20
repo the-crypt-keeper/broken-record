@@ -47,10 +47,12 @@ def find_and_remove_ngrams(text, n):
         ngram_counts = Counter(ngrams)
         common_ngrams = [(ngram, count) for ngram, count in ngram_counts.items() if count > 1]
         
-        for ngram, _ in common_ngrams:
-            text = remove_ngram_from_text(text, ngram)
+        if common_ngrams:
+            most_common_ngram = max(common_ngrams, key=lambda x: x[1])
+            text = remove_ngram_from_text(text, most_common_ngram[0])
+            return [most_common_ngram], text
         
-        return common_ngrams, text
+        return [], text
 
     all_common_ngrams = []
     while True:
