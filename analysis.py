@@ -119,14 +119,7 @@ def process_file(file_path):
     loop_score = calculate_loop_score(sorted_ngrams)
     loop_density = loop_score / character_count if character_count > 0 else 0
 
-    return {
-        'filename': filename,
-        'character_count': character_count,
-        'loop_score': loop_score,
-        'loop_density': loop_density,
-        'sorted_ngrams': sorted_ngrams,
-        'response_lengths': response_lengths
-    }
+    return filename, character_count, loop_score, loop_density, sorted_ngrams, response_lengths
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
@@ -157,7 +150,7 @@ if __name__ == "__main__":
     
     log_files = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if f.endswith('.log')]
     
-    with ThreadPoolExecutor(max_workers=2) as executor:
+    with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
         future_to_file = {executor.submit(process_file, file_path): file_path for file_path in log_files}
         
         for future in as_completed(future_to_file):
