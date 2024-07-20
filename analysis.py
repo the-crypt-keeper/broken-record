@@ -53,16 +53,15 @@ def extract_skye_lines(filename):
         # Remove "Skye:" from the beginning of each line and get individual response lengths
         response_lengths = []
         cleaned_lines = []
+        character_count = 0
         for line in skye_lines:
             cleaned_line = re.sub(r"^Skye:", "", line).strip()
             response_lengths.append(len(cleaned_line))
             cleaned_lines.append(cleaned_line)
+            character_count += len(cleaned_line)
         
         # Join all the lines into a single text block
         skye_text = ' '.join(cleaned_lines)
-        
-        # Count characters
-        character_count = len(skye_text)
         
         return skye_text.strip(), character_count, response_lengths
     except Exception as e:
@@ -157,7 +156,7 @@ if __name__ == "__main__":
                         density_buckets[bucket].append(filename)
                         break
                 
-                if loop_score > 1000 and loop_density > 0.3:
+                if loop_score > 1000 and loop_density > 0.05:
                     for ngram, count in sorted_ngrams[0:20]:
                         print(f"  {ngram} (found {count} times)")
                 
