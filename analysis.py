@@ -39,21 +39,21 @@ def extract_skye_lines(filename, n=1):
         # Create a histogram of the most common n-grams
         ngram_counts = Counter(ngrams)
         
-        return ngram_counts
+        return {os.path.basename(filename): ngram_counts}
     except Exception as e:
         print(f"Error processing file {filename}: {str(e)}")
-        return Counter()
+        return {}
 
 def process_folder(folder_path, n=1):
-    total_counts = Counter()
+    file_counts = {}
     
     for filename in os.listdir(folder_path):
         if filename.endswith('.log'):
             file_path = os.path.join(folder_path, filename)
-            file_counts = extract_skye_lines(file_path, n)
-            total_counts += file_counts
+            file_count = extract_skye_lines(file_path, n)
+            file_counts.update(file_count)
     
-    return total_counts
+    return file_counts
 
 if __name__ == "__main__":
     if len(sys.argv) < 2 or len(sys.argv) > 3:
@@ -70,8 +70,14 @@ if __name__ == "__main__":
     ngram_counts = process_folder(folder_path, n)
     
     if ngram_counts:
-        print(f"Most common {n}-grams across all files:")
-        for ngram, count in ngram_counts.most_common(25):
-            print(f"{ngram}: {count}")
+        print(f"Most common {n}-grams per file:")
+        for filename, counts in ngram_counts.items():
+            if counts:
+                print(f"\nFile: {filename}")
+                for ngram, count in counts.most_common(25):
+                    print(f"{ngram}: {count}")
+            else:
+                print(f"\nFile: {filename}")
+                print("No valid data found in this file.")
     else:
         print("No valid data found in the specified folder.")
