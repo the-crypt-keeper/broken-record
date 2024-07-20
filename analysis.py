@@ -35,23 +35,36 @@ def extract_skye_lines(filename):
         return ""
 
 def find_and_remove_ngrams(text, n):
-    words = text.split(' ')
-    ngrams = []
-    for i in range(len(words) - n + 1):
-        ngram = ' '.join(words[i:i+n])
-        if not any(word.lower() in IGNORED_WORDS for word in ngram.split()):
-            ngrams.append(ngram)
-    
-    ngram_counts = Counter(ngrams)
-    common_ngrams = [(ngram, count) for ngram, count in ngram_counts.items() if count > 1]
-    
-    for ngram, _ in common_ngrams:
-        old_len = len(text)
-        text = remove_ngram_from_text(text, ngram)
-        if len(text) == old_len:
-            print('REMOVE ERROR!', n, ngram)
-            
-    return common_ngrams, text
+    def find_and_remove_ngrams_once(text):
+        words = text.split(' ')
+        ngrams = []
+        for i in range(len(words) - n + 1):
+            ngram = ' '.join(words[i:i+n])
+            if not any(word.lower() in IGNORED_WORDS for word in ngram.split()):
+                ngrams.append(ngram)
+        
+        ngram_counts = Counter(ngrams)
+        common_ngrams = [(ngram, count) for ngram, count in ngram_counts.items() if count > 1]
+        
+        for ngram, _ in common_ngrams:
+            text = remove_ngram_from_text(text, ngram)
+        
+        return common_ngrams, text
+
+    all_common_ngrams = []
+    while True:
+        common_ngrams, new_text = find_and_remove_ngrams_once(text)
+        if not common_ngrams:
+            break
+        all_common_ngrams.extend(common_ngrams)
+        text = new_text
+
+    # Combine counts for ngrams that were removed multiple times
+    ngram_counts = Counter()
+    for ngram, count in all_common_ngrams:
+        ngram_counts[ngram] += count
+
+    return list(ngram_counts.items()), text
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
