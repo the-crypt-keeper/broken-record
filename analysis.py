@@ -34,10 +34,10 @@ def extract_skye_lines(filename):
         # Remove "Skye:" from the beginning of each line
         skye_text = re.sub(r"Skye:", "", skye_text)
         
-        # Count chr
-        word_count = len(skye_text.split())
+        # Count characters
+        character_count = len(skye_text)
         
-        return skye_text.strip(), word_count
+        return skye_text.strip(), character_count
     except Exception as e:
         print(f"Error processing file {filename}: {str(e)}")
         return "", 0
@@ -110,7 +110,7 @@ if __name__ == "__main__":
     for filename in os.listdir(folder_path):
         if filename.endswith('.log'):
             file_path = os.path.join(folder_path, filename)
-            text, word_count = extract_skye_lines(file_path)
+            text, character_count = extract_skye_lines(file_path)
             if text:
                 print(f"\n{filename}")
                 all_ngrams = []
@@ -123,8 +123,8 @@ if __name__ == "__main__":
                 
                 # Calculate and print the loop score and density
                 loop_score = calculate_loop_score(sorted_ngrams)
-                loop_density = loop_score / word_count if word_count > 0 else 0
-                print(f"Word Count: {word_count}")
+                loop_density = loop_score / character_count if character_count > 0 else 0
+                print(f"Character Count: {character_count}")
                 print(f"Loop Score: {loop_score}")
                 print(f"Loop Density: {loop_density:.4f}")
                 
