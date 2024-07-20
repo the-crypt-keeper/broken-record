@@ -7,8 +7,6 @@ import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import matplotlib.pyplot as plt
 
-IGNORED_WORDS = [] #"of","a","at","and","her","his","as","in","that","the","with","","are","to","she","he","for","I","him","says"]
-
 def create_length_histogram(lengths):
     if not lengths:
         return OrderedDict()
@@ -78,8 +76,7 @@ def find_and_remove_ngrams(text, n):
         ngrams = []
         for i in range(len(words) - n + 1):
             ngram = ' '.join(words[i:i+n])
-            if not any(word.lower() in IGNORED_WORDS for word in ngram.split()):
-                ngrams.append(ngram)
+            ngrams.append(ngram)
         
         ngram_counts = Counter(ngrams)
         common_ngrams = [(ngram, count) for ngram, count in ngram_counts.items() if count > 1]
@@ -180,6 +177,9 @@ if __name__ == "__main__":
                         
                         for ngram, count in sorted_ngrams[0:20]:
                             print(f"  {ngram} (found {count} times)")
+                            for ng2, ct2 in sorted_ngrams:
+                                if ng2.startswith(ngram) and ng2 != ngram:
+                                    print(f"  >> {ng2} (found {ct2} times)")
                         
                         all_response_lengths.extend(response_lengths)
                         scatterplot_data.append((avg_response_length, loop_density))

@@ -8,6 +8,8 @@ fi
 
 # Get the number of iterations from the first argument
 iterations=$1
+log_dir="parrot_$(date +%Y%m%d_%H%M%S)"
+mkdir -p "$log_dir"
 
 # Loop for the specified number of iterations
 for (( i=1; i<=$iterations; i++ ))
@@ -18,5 +20,5 @@ do
     echo "Running iteration $i, output will be saved to $log_file"
     
     # Run parrot.py and redirect stdout to the log file
-    python parrot.py | tee "$log_file"
+    python parrot.py | tee "$log_dir/$log_file"
 done

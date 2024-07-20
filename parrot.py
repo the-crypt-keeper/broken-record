@@ -70,7 +70,7 @@ if __name__ == "__main__":
     while sum(token_counts) < config.get('total_tokens', 2048):
         prompt = tokenizer.apply_chat_template(conversation, bos_token='', tokenize=False, add_generation_prompt=True) + config['agent_prefix']
         print(f"\n--- {sum(token_counts)} ---\n")
-        print(prompt, end='')
+        print(config['agent_prefix'], end='')
         
         completion, tokens, _, _ = stream_response(llm, prompt, config.get('sampler'), config.get('turn_max_tokens', 512))        
         token_counts.append(tokens)
