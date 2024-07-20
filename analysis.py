@@ -43,9 +43,9 @@ def find_and_remove_ngrams(text, n):
             ngrams.append(ngram)
     
     ngram_counts = Counter(ngrams)
-    common_ngrams = [ngram for ngram, count in ngram_counts.items() if count > 1]
+    common_ngrams = [(ngram, count) for ngram, count in ngram_counts.items() if count > 1]
     
-    for ngram in common_ngrams:
+    for ngram, _ in common_ngrams:
         text = remove_ngram_from_text(text, ngram)
     
     return common_ngrams, text
@@ -69,5 +69,5 @@ if __name__ == "__main__":
                 print(f"\n{filename}")
                 for n in range(32, 3, -1):
                     common_ngrams, text = find_and_remove_ngrams(text, n)
-                    for ngram in common_ngrams:
-                        print(f"  {ngram}")
+                    for ngram, count in common_ngrams:
+                        print(f"  {ngram} (found {count} times)")
