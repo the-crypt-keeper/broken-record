@@ -6,6 +6,28 @@ from collections import OrderedDict
 
 IGNORED_WORDS = [] #"of","a","at","and","her","his","as","in","that","the","with","","are","to","she","he","for","I","him","says"]
 
+def create_length_histogram(lengths, num_buckets=10):
+    if not lengths:
+        return {}
+    
+    min_length = min(lengths)
+    max_length = max(lengths)
+    bucket_size = (max_length - min_length) / num_buckets
+    
+    buckets = OrderedDict()
+    for i in range(num_buckets):
+        lower = min_length + i * bucket_size
+        upper = lower + bucket_size
+        buckets[(lower, upper)] = 0
+    
+    for length in lengths:
+        for (lower, upper), count in buckets.items():
+            if lower <= length < upper:
+                buckets[(lower, upper)] += 1
+                break
+    
+    return buckets
+
 def calculate_loop_score(ngrams):
     return sum(len(ngram.split()) * count for ngram, count in ngrams)
 
@@ -23,21 +45,26 @@ def extract_skye_lines(filename):
             done_index = next(i for i, line in enumerate(lines) if "--- DONE ---" in line)
         except StopIteration:
             print(f"Marker '--- DONE ---' not found in the file: {filename}")
-            return "", 0
+            return "", 0, []
 
         # Extract lines starting with "Skye:" after the marker
         skye_lines = [line.strip() for line in lines[done_index+1:] if line.startswith("Skye:")]
         
-        # Join all the lines into a single text block
-        skye_text = ' '.join(skye_lines)
+        # Remove "Skye:" from the beginning of each line and get individual response lengths
+        response_lengths = []
+        cleaned_lines = []
+        for line in skye_lines:
+            cleaned_line = re.sub(r"^Skye:", "", line).strip()
+            response_lengths.append(len(cleaned_line))
+            cleaned_lines.append(cleaned_line)
         
-        # Remove "Skye:" from the beginning of each line
-        skye_text = re.sub(r"Skye:", "", skye_text)
+        # Join all the lines into a single text block
+        skye_text = ' '.join(cleaned_lines)
         
         # Count characters
         character_count = len(skye_text)
         
-        return skye_text.strip(), character_count
+        return skye_text.strip(), character_count, response_lengths
     except Exception as e:
         print(f"Error processing file {filename}: {str(e)}")
         return "", 0
@@ -107,10 +134,12 @@ if __name__ == "__main__":
         (0.10, [])
     ])
     
+    all_response_lengths = []
+    
     for filename in os.listdir(folder_path):
         if filename.endswith('.log'):
             file_path = os.path.join(folder_path, filename)
-            text, character_count = extract_skye_lines(file_path)
+            text, character_count, response_lengths = extract_skye_lines(file_path)
             if text:
                 print(f"\n{filename}")
                 all_ngrams = []
@@ -137,6 +166,15 @@ if __name__ == "__main__":
                 if loop_score > 1000 and loop_density > 0.3:
                     for ngram, count in sorted_ngrams[0:20]:
                         print(f"  {ngram} (found {count} times)")
+                
+                all_response_lengths.extend(response_lengths)
 
-    # Display histogram
+    # Display loop density histogram
+    print("\nHistogram of Loop Densities:")
     display_histogram(density_buckets)
+
+    # Create and display response length histogram
+    length_histogram = create_length_histogram(all_response_lengths)
+    print("\nHistogram of Response Lengths:")
+    for (lower, upper), count in length_histogram.items():
+        print(f"{lower:.0f}-{upper:.0f}: {'#' * count} ({count})")
