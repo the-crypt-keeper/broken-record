@@ -82,6 +82,14 @@ if __name__ == "__main__":
     if not os.path.isdir(folder_path):
         print(f"Error: {folder_path} is not a valid directory")
         sys.exit(1)
+        
+    score_buckets = {
+        0: [],
+        500: [],
+        1000: [],
+        1500: [],
+        2000: []
+    }
     
     for filename in os.listdir(folder_path):
         if filename.endswith('.log'):
@@ -101,5 +109,6 @@ if __name__ == "__main__":
                 loop_score = calculate_loop_score(sorted_ngrams)
                 print(f"Loop Score: {loop_score}")
                 
-                for ngram, count in sorted_ngrams[0:20]:
-                    print(f"  {ngram} (found {count} times)")
+                if loop_score > 1000:
+                    for ngram, count in sorted_ngrams[0:20]:
+                        print(f"  {ngram} (found {count} times)")
