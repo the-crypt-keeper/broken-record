@@ -103,12 +103,6 @@ def find_and_remove_ngrams(text, n):
 
     return list(ngram_counts.items()), text
 
-def display_histogram(density_buckets):
-    print("\nHistogram of Loop Densities:")
-    for bucket, filenames in density_buckets.items():
-        next_bucket = list(density_buckets.keys())[list(density_buckets.keys()).index(bucket) + 1] if bucket != list(density_buckets.keys())[-1] else float("inf")
-        print(f"{bucket:.2f}-{next_bucket:.2f}: {'#' * len(filenames)} ({len(filenames)})")
-
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("Usage: python script.py <folder_path>")
@@ -171,7 +165,9 @@ if __name__ == "__main__":
 
     # Display loop density histogram
     print("\nHistogram of Loop Densities:")
-    display_histogram(density_buckets)
+    for bucket, filenames in density_buckets.items():
+        next_bucket = list(density_buckets.keys())[list(density_buckets.keys()).index(bucket) + 1] if bucket != list(density_buckets.keys())[-1] else float("inf")
+        print(f"{bucket:.2f}-{next_bucket:.2f}: {'#' * len(filenames)} ({len(filenames)})")
 
     # Create and display response length histogram
     length_histogram = create_length_histogram(all_response_lengths)
