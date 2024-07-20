@@ -23,7 +23,7 @@ def extract_skye_lines(filename):
             done_index = next(i for i, line in enumerate(lines) if "--- DONE ---" in line)
         except StopIteration:
             print(f"Marker '--- DONE ---' not found in the file: {filename}")
-            return ""
+            return "", 0
 
         # Extract lines starting with "Skye:" after the marker
         skye_lines = [line.strip() for line in lines[done_index+1:] if line.startswith("Skye:")]
@@ -34,10 +34,13 @@ def extract_skye_lines(filename):
         # Remove "Skye:" from the beginning of each line
         skye_text = re.sub(r"Skye:", "", skye_text)
         
-        return skye_text.strip()
+        # Count words
+        word_count = len(skye_text.split())
+        
+        return skye_text.strip(), word_count
     except Exception as e:
         print(f"Error processing file {filename}: {str(e)}")
-        return ""
+        return "", 0
 
 def find_and_remove_ngrams(text, n):
     def find_and_remove_ngrams_once(text):
@@ -73,11 +76,11 @@ def find_and_remove_ngrams(text, n):
 
     return list(ngram_counts.items()), text
 
-def display_histogram(score_buckets):
-    print("\nHistogram of Loop Scores:")
-    for bucket, filenames in score_buckets.items():
-        next_bucket = list(score_buckets.keys())[list(score_buckets.keys()).index(bucket) + 1] if bucket != list(score_buckets.keys())[-1] else "inf"
-        print(f"{bucket}-{next_bucket}: {'#' * len(filenames)} ({len(filenames)})")
+def display_histogram(density_buckets):
+    print("\nHistogram of Loop Densities:")
+    for bucket, filenames in density_buckets.items():
+        next_bucket = list(density_buckets.keys())[list(density_buckets.keys()).index(bucket) + 1] if bucket != list(density_buckets.keys())[-1] else "inf"
+        print(f"{bucket:.2f}-{next_bucket:.2f}: {'#' * len(filenames)} ({len(filenames)})")
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
@@ -90,18 +93,18 @@ if __name__ == "__main__":
         print(f"Error: {folder_path} is not a valid directory")
         sys.exit(1)
         
-    score_buckets = OrderedDict([
-        (0, []),
-        (500, []),
-        (1000, []),
-        (1500, []),
-        (2000, [])
+    density_buckets = OrderedDict([
+        (0.0, []),
+        (0.1, []),
+        (0.2, []),
+        (0.3, []),
+        (0.4, [])
     ])
     
     for filename in os.listdir(folder_path):
         if filename.endswith('.log'):
             file_path = os.path.join(folder_path, filename)
-            text = extract_skye_lines(file_path)
+            text, word_count = extract_skye_lines(file_path)
             if text:
                 print(f"\n{filename}")
                 all_ngrams = []
@@ -112,19 +115,22 @@ if __name__ == "__main__":
                 # Sort all_ngrams by count in descending order
                 sorted_ngrams = sorted(all_ngrams, key=lambda x: x[1], reverse=True)
                 
-                # Calculate and print the loop score
+                # Calculate and print the loop score and density
                 loop_score = calculate_loop_score(sorted_ngrams)
+                loop_density = loop_score / word_count if word_count > 0 else 0
+                print(f"Word Count: {word_count}")
                 print(f"Loop Score: {loop_score}")
+                print(f"Loop Density: {loop_density:.4f}")
                 
                 # Add filename to appropriate bucket
-                for bucket in reversed(score_buckets.keys()):
-                    if loop_score >= bucket:
-                        score_buckets[bucket].append(filename)
+                for bucket in reversed(density_buckets.keys()):
+                    if loop_density >= bucket:
+                        density_buckets[bucket].append(filename)
                         break
                 
-                if loop_score > 1000:
+                if loop_density > 0.2:
                     for ngram, count in sorted_ngrams[0:20]:
                         print(f"  {ngram} (found {count} times)")
 
     # Display histogram
-    display_histogram(score_buckets)
+    display_histogram(density_buckets)
