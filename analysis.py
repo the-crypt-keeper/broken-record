@@ -152,7 +152,7 @@ if __name__ == "__main__":
     
     lock = threading.Lock()
     
-    with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
+    with ThreadPoolExecutor(max_workers=2) as executor:
         future_to_file = {executor.submit(process_file, file_path): file_path for file_path in log_files}
         
         for future in as_completed(future_to_file):
