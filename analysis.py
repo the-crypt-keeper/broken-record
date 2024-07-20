@@ -5,6 +5,9 @@ import re
 
 IGNORED_WORDS = [] #"of","a","at","and","her","his","as","in","that","the","with","","are","to","she","he","for","I","him","says"]
 
+def calculate_loop_score(ngrams):
+    return sum(len(ngram.split()) * count for ngram, count in ngrams)
+
 def remove_ngram_from_text(text, ngram):
     if not ngram in text: print('REMOVE ERROR', ngram)
     return text.replace(ngram, '')
@@ -93,6 +96,10 @@ if __name__ == "__main__":
                 
                 # Sort all_ngrams by count in descending order
                 sorted_ngrams = sorted(all_ngrams, key=lambda x: x[1], reverse=True)
+                
+                # Calculate and print the loop score
+                loop_score = calculate_loop_score(sorted_ngrams)
+                print(f"Loop Score: {loop_score}")
                 
                 for ngram, count in sorted_ngrams[0:20]:
                     print(f"  {ngram} (found {count} times)")
