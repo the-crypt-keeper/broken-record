@@ -50,22 +50,6 @@ def find_and_remove_ngrams(text, n):
     
     return common_ngrams, text
 
-def process_folder(folder_path):
-    file_results = {}
-    
-    for filename in os.listdir(folder_path):
-        if filename.endswith('.log'):
-            file_path = os.path.join(folder_path, filename)
-            text = extract_skye_lines(file_path)
-            if text:
-                file_results[os.path.basename(filename)] = []
-                for n in range(32, 3, -1):
-                    common_ngrams, text = find_and_remove_ngrams(text, n)
-                    if common_ngrams:
-                        file_results[os.path.basename(filename)].extend(common_ngrams)
-    
-    return file_results
-
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("Usage: python script.py <folder_path>")
@@ -77,9 +61,13 @@ if __name__ == "__main__":
         print(f"Error: {folder_path} is not a valid directory")
         sys.exit(1)
     
-    file_results = process_folder(folder_path)
-    
-    for filename, ngrams in file_results.items():
-        print(f"\n{filename}")
-        for ngram in ngrams:
-            print(f"  {ngram}")
+    for filename in os.listdir(folder_path):
+        if filename.endswith('.log'):
+            file_path = os.path.join(folder_path, filename)
+            text = extract_skye_lines(file_path)
+            if text:
+                print(f"\n{filename}")
+                for n in range(32, 3, -1):
+                    common_ngrams, text = find_and_remove_ngrams(text, n)
+                    for ngram in common_ngrams:
+                        print(f"  {ngram}")
