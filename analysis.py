@@ -2,6 +2,7 @@ import sys
 import os
 from collections import Counter
 import re
+from collections import OrderedDict
 
 IGNORED_WORDS = [] #"of","a","at","and","her","his","as","in","that","the","with","","are","to","she","he","for","I","him","says"]
 
@@ -72,6 +73,12 @@ def find_and_remove_ngrams(text, n):
 
     return list(ngram_counts.items()), text
 
+def display_histogram(score_buckets):
+    print("\nHistogram of Loop Scores:")
+    for bucket, filenames in score_buckets.items():
+        next_bucket = list(score_buckets.keys())[list(score_buckets.keys()).index(bucket) + 1] if bucket != list(score_buckets.keys())[-1] else "inf"
+        print(f"{bucket}-{next_bucket}: {'#' * len(filenames)} ({len(filenames)})")
+
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("Usage: python script.py <folder_path>")
@@ -83,13 +90,13 @@ if __name__ == "__main__":
         print(f"Error: {folder_path} is not a valid directory")
         sys.exit(1)
         
-    score_buckets = {
-        0: [],
-        500: [],
-        1000: [],
-        1500: [],
-        2000: []
-    }
+    score_buckets = OrderedDict([
+        (0, []),
+        (500, []),
+        (1000, []),
+        (1500, []),
+        (2000, [])
+    ])
     
     for filename in os.listdir(folder_path):
         if filename.endswith('.log'):
@@ -109,6 +116,15 @@ if __name__ == "__main__":
                 loop_score = calculate_loop_score(sorted_ngrams)
                 print(f"Loop Score: {loop_score}")
                 
+                # Add filename to appropriate bucket
+                for bucket in reversed(score_buckets.keys()):
+                    if loop_score >= bucket:
+                        score_buckets[bucket].append(filename)
+                        break
+                
                 if loop_score > 1000:
                     for ngram, count in sorted_ngrams[0:20]:
                         print(f"  {ngram} (found {count} times)")
+
+    # Display histogram
+    display_histogram(score_buckets)
