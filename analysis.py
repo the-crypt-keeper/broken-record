@@ -6,25 +6,25 @@ from collections import OrderedDict
 
 IGNORED_WORDS = [] #"of","a","at","and","her","his","as","in","that","the","with","","are","to","she","he","for","I","him","says"]
 
-def create_length_histogram(lengths, num_buckets=10):
+def create_length_histogram(lengths):
     if not lengths:
-        return {}
+        return OrderedDict()
     
-    min_length = 0
-    max_length = max(lengths)
-    bucket_size = (max_length - min_length) / num_buckets
-    
-    buckets = OrderedDict()
-    for i in range(num_buckets):
-        lower = min_length + i * bucket_size
-        upper = lower + bucket_size
-        buckets[(lower, upper)] = 0
+    buckets = OrderedDict([
+        ((0, 1), 0),
+        *[((i * 100, (i + 1) * 100), 0) for i in range(10)],
+        ((1000, float('inf')), 0)
+    ])
     
     for length in lengths:
-        for (lower, upper), count in buckets.items():
-            if lower <= length < upper:
-                buckets[(lower, upper)] += 1
-                break
+        if length <= 1:
+            buckets[(0, 1)] += 1
+        elif length > 1000:
+            buckets[(1000, float('inf'))] += 1
+        else:
+            bucket_index = (length - 1) // 100
+            bucket_key = list(buckets.keys())[bucket_index + 1]  # +1 to account for the 0-1 bucket
+            buckets[bucket_key] += 1
     
     return buckets
 
