@@ -45,15 +45,18 @@ def extract_skye_lines(filename, n=1):
         return {}
 
 def process_folder(folder_path, n=1):
+    combined_counts = Counter()
     file_counts = {}
     
     for filename in os.listdir(folder_path):
         if filename.endswith('.log'):
             file_path = os.path.join(folder_path, filename)
             file_count = extract_skye_lines(file_path, n)
-            file_counts.update(file_count)
+            if file_count:
+                file_counts[os.path.basename(filename)] = file_count[os.path.basename(filename)]
+                combined_counts.update(file_count[os.path.basename(filename)])
     
-    return file_counts
+    return combined_counts, file_counts
 
 if __name__ == "__main__":
     if len(sys.argv) < 2 or len(sys.argv) > 3:
@@ -67,17 +70,15 @@ if __name__ == "__main__":
         print(f"Error: {folder_path} is not a valid directory")
         sys.exit(1)
     
-    ngram_counts = process_folder(folder_path, n)
+    combined_counts, file_counts = process_folder(folder_path, n)
     
-    if ngram_counts:
-        print(f"Most common {n}-grams per file:")
-        for filename, counts in ngram_counts.items():
-            if counts:
-                print(f"\nFile: {filename}")
-                for ngram, count in counts.most_common(25):
-                    print(f"{ngram}: {count}")
-            else:
-                print(f"\nFile: {filename}")
-                print("No valid data found in this file.")
+    if combined_counts:
+        print(f"Most common {n}-grams across all files:")
+        for ngram, count in combined_counts.most_common(25):
+            print(f"\n{ngram}: {count}")
+            print("Files:")
+            for filename, counts in file_counts.items():
+                if ngram in counts:
+                    print(f"  {filename}: {counts[ngram]}")
     else:
         print("No valid data found in the specified folder.")
