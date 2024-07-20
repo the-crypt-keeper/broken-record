@@ -150,6 +150,8 @@ if __name__ == "__main__":
     
     log_files = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if f.endswith('.log')]
     
+    lock = threading.Lock()
+    
     with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
         future_to_file = {executor.submit(process_file, file_path): file_path for file_path in log_files}
         
@@ -158,21 +160,24 @@ if __name__ == "__main__":
             try:
                 result = future.result()
                 if result:
-                    print(f"\n{result['filename']}")
-                    print(f"Character Count: {result['character_count']}")
-                    print(f"Loop Score: {result['loop_score']}")
-                    print(f"Loop Density: {result['loop_density']:.4f}")
+                    filename, character_count, loop_score, loop_density, sorted_ngrams, response_lengths = result
                     
-                    for bucket in reversed(density_buckets.keys()):
-                        if result['loop_density'] >= bucket:
-                            density_buckets[bucket].append(result['filename'])
-                            break
-                    
-                    if result['loop_score'] > 1000 and result['loop_density'] > 0.05:
-                        for ngram, count in result['sorted_ngrams'][0:20]:
-                            print(f"  {ngram} (found {count} times)")
-                    
-                    all_response_lengths.extend(result['response_lengths'])
+                    with lock:
+                        print(f"\n{filename}")
+                        print(f"Character Count: {character_count}")
+                        print(f"Loop Score: {loop_score}")
+                        print(f"Loop Density: {loop_density:.4f}")
+                        
+                        for bucket in reversed(density_buckets.keys()):
+                            if loop_density >= bucket:
+                                density_buckets[bucket].append(filename)
+                                break
+                        
+                        if loop_score > 1000 and loop_density > 0.05:
+                            for ngram, count in sorted_ngrams[0:20]:
+                                print(f"  {ngram} (found {count} times)")
+                        
+                        all_response_lengths.extend(response_lengths)
             except Exception as exc:
                 print(f'{file_path} generated an exception: {exc}')
 
