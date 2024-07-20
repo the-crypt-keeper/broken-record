@@ -72,13 +72,19 @@ if __name__ == "__main__":
     
     combined_counts, file_counts = process_folder(folder_path, n)
     
-    if combined_counts:
-        print(f"Most common {n}-grams across all files:")
-        for ngram, count in combined_counts.most_common(25):
-            print(f"\n{ngram}: {count}")
-            print("Files:")
-            for filename, counts in file_counts.items():
-                if ngram in counts:
-                    print(f"  {filename}: {counts[ngram]}")
-    else:
-        print("No valid data found in the specified folder.")
+    # if combined_counts:
+    #     print(f"Most common {n}-grams across all files:")
+    #     for ngram, count in combined_counts.most_common(25):
+    #         print(f"\n{ngram}: {count}")
+    #         print("Files:")
+    #         for filename, counts in file_counts.items():
+    #             if ngram in counts:
+    #                 print(f"  {filename}: {counts[ngram]}")
+    # else:
+    #     print("No valid data found in the specified folder.")
+
+    for filename, counts in file_counts.items():
+        print()
+        print(f"{filename}")
+        for ngram, count in counts.most_common(10):
+            print(f"  {ngram}: {counts[ngram]}")
