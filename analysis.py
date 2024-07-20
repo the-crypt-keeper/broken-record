@@ -5,6 +5,7 @@ import re
 from collections import OrderedDict
 import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
+import matplotlib.pyplot as plt
 
 IGNORED_WORDS = [] #"of","a","at","and","her","his","as","in","that","the","with","","are","to","she","he","for","I","him","says"]
 
@@ -120,7 +121,8 @@ def process_file(file_path):
     loop_score = calculate_loop_score(sorted_ngrams)
     loop_density = loop_score / character_count if character_count > 0 else 0
 
-    return filename, character_count, loop_score, loop_density, sorted_ngrams, response_lengths
+    avg_response_length = sum(response_lengths) / len(response_lengths) if response_lengths else 0
+    return filename, character_count, loop_score, loop_density, sorted_ngrams, response_lengths, avg_response_length
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
@@ -148,6 +150,7 @@ if __name__ == "__main__":
     ])
     
     all_response_lengths = []
+    scatterplot_data = []
     
     log_files = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if f.endswith('.log')]
     
@@ -161,13 +164,14 @@ if __name__ == "__main__":
             try:
                 result = future.result()
                 if result:
-                    filename, character_count, loop_score, loop_density, sorted_ngrams, response_lengths = result
+                    filename, character_count, loop_score, loop_density, sorted_ngrams, response_lengths, avg_response_length = result
                     
                     with lock:
                         print(f"\n{filename}")
                         print(f"Character Count: {character_count}")
                         print(f"Loop Score: {loop_score}")
                         print(f"Loop Density: {loop_density:.4f}")
+                        print(f"Average Response Length: {avg_response_length:.2f}")
                         
                         for bucket in reversed(density_buckets.keys()):
                             if loop_density >= bucket:
@@ -178,6 +182,7 @@ if __name__ == "__main__":
                             print(f"  {ngram} (found {count} times)")
                         
                         all_response_lengths.extend(response_lengths)
+                        scatterplot_data.append((avg_response_length, loop_density))
             except Exception as exc:
                 print(f'{file_path} generated an exception: {exc}')
 
@@ -192,3 +197,14 @@ if __name__ == "__main__":
     print("\nHistogram of Response Lengths:")
     for (lower, upper), count in length_histogram.items():
         print(f"{lower:.0f}-{upper:.0f}: {'#' * count} ({count})")
+
+    # Create and display the scatterplot
+    plt.figure(figsize=(10, 6))
+    x, y = zip(*scatterplot_data)
+    plt.scatter(x, y)
+    plt.xlabel('Average Response Length')
+    plt.ylabel('Loop Density')
+    plt.title('Average Response Length vs Loop Density')
+    plt.savefig('response_length_vs_loop_density.png')
+    plt.close()
+    print("\nScatterplot saved as 'response_length_vs_loop_density.png'")
