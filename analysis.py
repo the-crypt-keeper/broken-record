@@ -3,7 +3,7 @@ import os
 from collections import Counter
 import re
 
-IGNORED_WORDS = ["of","a","at","and","her","his","as","in","that","the","with","","are","to","she","he","for","I","him","says"]
+IGNORED_WORDS = [] #"of","a","at","and","her","his","as","in","that","the","with","","are","to","she","he","for","I","him","says"]
 
 def extract_skye_lines(filename, n=1):
     try:
@@ -48,7 +48,7 @@ def process_folder(folder_path, n=1):
     total_counts = Counter()
     
     for filename in os.listdir(folder_path):
-        if filename.endswith('.txt'):  # Assuming log files are .txt
+        if filename.endswith('.log'):
             file_path = os.path.join(folder_path, filename)
             file_counts = extract_skye_lines(file_path, n)
             total_counts += file_counts
