@@ -211,7 +211,7 @@ if __name__ == "__main__":
     plt.xlabel('Average Response Length')
     plt.ylabel('Loop Density')
     plt.title('Average Response Length vs Loop Density')
-    plt.xlim(0, 1024)
+    plt.xlim(0, 2000)
     plt.ylim(0, 1)
     plt.scatter(x, y)
     plt.savefig(os.path.join(folder_path, 'response_length_vs_loop_density.png'))
