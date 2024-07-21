@@ -43,13 +43,19 @@ def create_scatter_plot(data):
 def create_summary_table(data):
     summary_data = []
     for folder, points in data.items():
+        num_samples = len(points)
         if points:  # Check if there are any points for this folder
-            avg_response_length = sum(point[0] for point in points) / len(points)
-            avg_loop_density = sum(point[1] for point in points) / len(points)
+            avg_response_length = sum(point[0] for point in points) / num_samples
+            avg_loop_density = sum(point[1] for point in points) / num_samples
         else:
             avg_response_length = 0
             avg_loop_density = 0
-        summary_data.append({'Result Set': folder, 'Avg Response Length': avg_response_length, 'Avg Loop Density': avg_loop_density})
+        summary_data.append({
+            'Result Set': folder,
+            'Num Samples': num_samples,
+            'Avg Response Length': avg_response_length,
+            'Avg Loop Density': avg_loop_density
+        })
 
     df = pd.DataFrame(summary_data)
     print("DataFrame contents:")
@@ -59,6 +65,7 @@ def create_summary_table(data):
 
     columns = [
         TableColumn(field="Result Set", title="Result Set"),
+        TableColumn(field="Num Samples", title="Num Samples", formatter=NumberFormatter(format="0")),
         TableColumn(field="Avg Response Length", title="Avg Response Length", formatter=NumberFormatter(format="0.00")),
         TableColumn(field="Avg Loop Density", title="Avg Loop Density", formatter=NumberFormatter(format="0.0000"))
     ]
