@@ -4,13 +4,16 @@
 
 Parrot is a powerful tool designed for generating synthetic deep-roleplay dialogues using advanced language models. It simulates conversations between two characters, allowing for the creation of rich, interactive narratives and enable investigation into LLM conversation looping behaviors.
 
+Tested up to 16K token, 100+ turn conversations.
+
 ## Features
 
-- Configurable conversation settings
 - Utilizes two separate language models for assistant and user roles
-- Streaming response generation
-- Token counting and management
-- Customizable sampling parameters
+  - Assistant Model with full context length
+  - User Model with (optionally) smaller context
+- Streaming generation, read while it writes
+- Highly Configurable
+- Automatically analyze results for repetition
 
 ## Design Evolution
 
@@ -53,17 +56,24 @@ In addition to Loops, some Breaks have also been identified:
 1. `parrot.py`: The main Python script that handles the dialogue generation.
 2. `parrot.sh`: A Bash script for running multiple iterations of the dialogue generation.
 3. `config.json`: Configuration file for setting up the dialogue parameters.
+4. `analyze.py`: A python script to identify loops in assistant and compute loop_density: the % of LLM output that's repeditive.
 
 ## Usage
 
-1. Set up your configuration in `config.json`. Refer to [CONFIG.md](CONFIG.md) for detailed information on the configuration options.
+1. Launch an inference engine for each of the two LLMs.
 
-2. Run a single iteration for testing:
+For `llama-server` specify the desired context size with `-c <ctx>`
+
+For `aphrodite-engine` or `vLLM` specify the context size with `--max-model-len <ctx>`
+
+2. Set up your configuration in `config.json`. Refer to [CONFIG.md](CONFIG.md) for detailed information on the configuration options.
+
+3. Run a single iteration for testing:
    ```
    python parrot.py
    ```
 
-3. Run multiple iterations with logging using the bash script:
+4. Run multiple iterations with logging using the bash script:
    ```
    ./parrot.sh <number_of_iterations>
    ```
