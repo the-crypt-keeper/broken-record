@@ -86,5 +86,5 @@ if __name__ == "__main__":
         print("Usage: python view.py <directory1> <directory2> ...")
         sys.exit(1)
     
-    directories = sys.argv[1:]
+    directories = [directory.rstrip('/') for directory in sys.argv[1:]]
     main(directories)
