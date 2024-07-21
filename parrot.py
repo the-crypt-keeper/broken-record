@@ -85,7 +85,8 @@ if __name__ == "__main__":
     user_tokenizer = AutoTokenizer.from_pretrained(config.get('user_tokenizer', config['tokenizer']))
 
     conversation = config['conversation']
-    token_counts = [0 for x in range(len(conversation))]    
+    token_counts = [0 for x in range(len(conversation))]
+    token_counts[0] = config.get('initial_tokens',0)
    
     while sum(token_counts) < config.get('total_tokens', 2048):
         prompt = tokenizer.apply_chat_template(conversation, bos_token='', tokenize=False, add_generation_prompt=True) + config['agent_prefix']

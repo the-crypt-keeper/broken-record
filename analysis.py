@@ -30,7 +30,7 @@ def create_length_histogram(lengths):
     return buckets
 
 def calculate_loop_score(ngrams):
-    return sum(len(ngram.split()) * count for ngram, count in ngrams)
+    return sum(len(ngram) * count for ngram, count in ngrams)
 
 def remove_ngram_from_text(text, ngram):
     if not ngram in text: print('REMOVE ERROR', ngram)
