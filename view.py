@@ -46,9 +46,12 @@ def create_summary_table(data):
     for folder, points in data.items():
         avg_response_length = sum(point[0] for point in points) / len(points)
         avg_loop_density = sum(point[1] for point in points) / len(points)
-        summary_data.append((folder, avg_response_length, avg_loop_density))
+        summary_data.append({'Result Set': folder, 'Avg Response Length': avg_response_length, 'Avg Loop Density': avg_loop_density})
 
-    df = pd.DataFrame(summary_data, columns=['Result Set', 'Avg Response Length', 'Avg Loop Density'])
+    df = pd.DataFrame(summary_data)
+    print("DataFrame contents:")
+    print(df)  # Debugging print
+
     source = ColumnDataSource(df)
 
     columns = [
@@ -62,6 +65,10 @@ def create_summary_table(data):
 
 def main(directories):
     data = load_data(directories)
+    print("Loaded data:")
+    for folder, points in data.items():
+        print(f"{folder}: {len(points)} points")
+    
     scatter_plot = create_scatter_plot(data)
     summary_table = create_summary_table(data)
 
