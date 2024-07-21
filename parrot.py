@@ -11,6 +11,7 @@ def stream_response(llm, prompt, sampler, max_tokens = 2048):
         "n": 1,
         "prompt": prompt,
         "n_predict": max_tokens,
+        "max_tokens": max_tokens,
         "stream": True,
         "cache_prompt": True,
         **sampler
@@ -30,18 +31,37 @@ def stream_response(llm, prompt, sampler, max_tokens = 2048):
                 if line:
                     decoded_line = line.decode('utf-8')
                     if decoded_line.startswith('data: '):
-                        json_data = json.loads(decoded_line[6:])
-                        if 'content' in json_data:                           
-                            completion += json_data['content']
-                            print(json_data['content'], end='')
-                            sys.stdout.flush()
-                            tokens += 1
-                            if first_token_time is None: first_token_time = time.time()
+                        if decoded_line[6:] == '[DONE]':
+                            break
+                        
+                        try:
+                            json_data = json.loads(decoded_line[6:])
+                        except Exception as e:
+                            print('ERROR')
+                            print(decoded_line)
+                            print(str(e))
+                            continue
                             
-                            if json_data['stop']:
-                                break
+                        
+                        fragment = None
+                        stop = False
+                        
+                        if 'content' in json_data:
+                            fragment = json_data['content']
+                            stop = json_data['stop']
+                        elif 'choices' in json_data:
+                            fragment = json_data['choices'][0]['text']
+                            stop = json_data['choices'][0]['stop_reason'] is not None
                         else:
                             print(f"Error: {json_data}")
+                            
+                        completion += fragment
+                        print(fragment, end='')
+                        sys.stdout.flush()
+                        tokens += 1
+                        if first_token_time is None: first_token_time = time.time()
+                        
+                        if stop: break                            
                         
     except requests.exceptions.RequestException as e:
         print(f"Error: {e}")
@@ -52,7 +72,7 @@ def stream_response(llm, prompt, sampler, max_tokens = 2048):
     return completion, tokens, ttfs, elapsed
 
 if __name__ == "__main__":
-    with open('config.json') as f:
+    with open('config.json' if len(sys.argv) == 1 else sys.argv[1]) as f:
         config = json.load(f)
         
     llm = {'api_url': config['api_url'] }
