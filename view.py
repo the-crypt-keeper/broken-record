@@ -15,6 +15,8 @@ def load_data(directories):
         if os.path.exists(json_file):
             with open(json_file, 'r') as f:
                 data[os.path.basename(directory)] = json.load(f)
+        else:
+            data[os.path.basename(directory)] = []  # Empty list if JSON file doesn't exist
     return data
 
 def create_scatter_plot(data):
@@ -44,8 +46,12 @@ def create_scatter_plot(data):
 def create_summary_table(data):
     summary_data = []
     for folder, points in data.items():
-        avg_response_length = sum(point[0] for point in points) / len(points)
-        avg_loop_density = sum(point[1] for point in points) / len(points)
+        if points:  # Check if there are any points for this folder
+            avg_response_length = sum(point[0] for point in points) / len(points)
+            avg_loop_density = sum(point[1] for point in points) / len(points)
+        else:
+            avg_response_length = 0
+            avg_loop_density = 0
         summary_data.append({'Result Set': folder, 'Avg Response Length': avg_response_length, 'Avg Loop Density': avg_loop_density})
 
     df = pd.DataFrame(summary_data)
