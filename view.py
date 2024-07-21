@@ -12,11 +12,8 @@ def load_data(directories):
     data = {}
     for directory in directories:
         json_file = os.path.join(directory, 'response_length_vs_loop_density.json')
-        if os.path.exists(json_file):
-            with open(json_file, 'r') as f:
-                data[os.path.basename(directory)] = json.load(f)
-        else:
-            data[os.path.basename(directory)] = []  # Empty list if JSON file doesn't exist
+        with open(json_file, 'r') as f:
+            data[os.path.basename(directory).replace('results-','')] = json.load(f)
     return data
 
 def create_scatter_plot(data):
