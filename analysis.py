@@ -6,6 +6,7 @@ from collections import OrderedDict
 import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import matplotlib.pyplot as plt
+import json
 
 def create_length_histogram(lengths):
     if not lengths:
@@ -134,16 +135,22 @@ if __name__ == "__main__":
         
     density_buckets = OrderedDict([
         (0.0, []),
+        (0.05, []),
         (0.1, []),
+        (0.15, []),
         (0.2, []),
+        (0.25, []),
         (0.3, []),
+        (0.35, []),
         (0.4, []),
+        (0.45, []),
         (0.5, []),
+        (0.55, []),
         (0.6, []),
+        (0.65, []),
         (0.7, []),
-        (0.8, []),
-        (0.9, []),
-        (1.0, [])
+        (0.75, []),
+        (0.8, [])
     ])
     
     all_response_lengths = []
@@ -153,7 +160,7 @@ if __name__ == "__main__":
     
     lock = threading.Lock()
     
-    with ThreadPoolExecutor(max_workers=2) as executor:
+    with ThreadPoolExecutor(max_workers=4) as executor:
         future_to_file = {executor.submit(process_file, file_path): file_path for file_path in log_files}
         
         for future in as_completed(future_to_file):
@@ -201,12 +208,14 @@ if __name__ == "__main__":
     # Create and display the scatterplot
     plt.figure(figsize=(10, 6))
     x, y = zip(*scatterplot_data)
-    plt.scatter(x, y)
     plt.xlabel('Average Response Length')
     plt.ylabel('Loop Density')
     plt.title('Average Response Length vs Loop Density')
     plt.xlim(0, 1024)
     plt.ylim(0, 1)
-    plt.savefig('response_length_vs_loop_density.png')
+    plt.scatter(x, y)
+    plt.savefig(os.path.join(folder_path, 'response_length_vs_loop_density.png'))
     plt.close()
-    print("\nScatterplot saved as 'response_length_vs_loop_density.png'")
+    
+    with open(os.path.join(folder_path, 'response_length_vs_loop_density.json'), 'w') as f:
+        json.dump(scatterplot_data, f)
