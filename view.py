@@ -3,7 +3,7 @@ import os
 import json
 import pandas as pd
 from bokeh.plotting import figure, show
-from bokeh.models import ColumnDataSource, HoverTool, DataTable, TableColumn
+from bokeh.models import ColumnDataSource, HoverTool, DataTable, TableColumn, NumberFormatter
 from bokeh.layouts import column
 from bokeh.palettes import Category10
 from bokeh.io import output_file
@@ -53,8 +53,8 @@ def create_summary_table(data):
 
     columns = [
         TableColumn(field="Result Set", title="Result Set"),
-        TableColumn(field="Avg Response Length", title="Avg Response Length", formatter=dict(format="0.2f")),
-        TableColumn(field="Avg Loop Density", title="Avg Loop Density", formatter=dict(format="0.4f"))
+        TableColumn(field="Avg Response Length", title="Avg Response Length", formatter=NumberFormatter(format="0.00")),
+        TableColumn(field="Avg Loop Density", title="Avg Loop Density", formatter=NumberFormatter(format="0.0000"))
     ]
 
     data_table = DataTable(source=source, columns=columns, width=1000, height=280)
