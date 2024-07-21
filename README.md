@@ -54,9 +54,10 @@ In addition to Loops, some Breaks have also been identified:
 ## Components
 
 1. `parrot.py`: The main Python script that handles the dialogue generation.
-2. `parrot.sh`: A Bash script for running multiple iterations of the dialogue generation.
+2. `parrot.sh`: A Bash script for running multiple iterations of the dialogue generation and logging the results.
 3. `config.json`: Configuration file for setting up the dialogue parameters.
-4. `analyze.py`: A python script to identify loops in assistant and compute loop_density: the % of LLM output that's repeditive.
+4. `analyze.py`: A python script to parse parrot logs and identify common segments in assistant speech and compute metrics.
+5. `view.py`: A streamlit application to visualize and compare results between multiple runs.
 
 ## Usage
 
