@@ -2,7 +2,9 @@
 
 ## Overview
 
-Parrot is a powerful tool designed for generating synthetic deep-roleplay dialogues using advanced language models. It simulates conversations between two characters, allowing for the creation of rich, interactive narratives and enable investigation into LLM conversation looping behaviors.
+Parrot is a powerful tool designed for generating synthetic deep-roleplay dialogues using advanced language models.
+
+It simulates a conversation between two characters, the results powering an investigation into LLM multi-turn conversation looping behaviors.
 
 Tested up to 16K token, 100+ turn conversations.
 
@@ -11,9 +13,68 @@ Tested up to 16K token, 100+ turn conversations.
 - Utilizes two separate language models for assistant and user roles
   - Assistant Model with full context length
   - User Model with (optionally) smaller context
+- Supports `llama-server`, `koboldcpp` and `aphrodite-engine` for inference
 - Streaming generation, read while it writes
-- Highly Configurable
 - Automatically analyze results for repetition
+- Visually compare repetition and responce lengths across models, sampler settings and inference engines
+
+## Requirements
+
+`pip install -r requirements.txt`
+
+## Components
+
+1. `parrot.py`: The main Python script that handles the dialogue generation.
+2. `parrot.sh`: A Bash script for running multiple iterations of the dialogue generation and logging the results.
+3. `config.json`: Configuration file for setting up the dialogue parameters.
+4. `analyze.py`: A python script to parse parrot logs and identify common segments in assistant speech and compute metrics.
+5. `view.py`: A streamlit application to visualize and compare results between multiple runs.
+
+## Usage
+
+1. Launch an inference engine for each of the two LLMs.
+
+For `llama-server` specify the desired context size with `-c <ctx>`
+
+For `aphrodite-engine` or `vLLM` specify the context size with `--max-model-len <ctx>`
+
+2. Set up your configuration in `config.json`. Refer to [CONFIG.md](CONFIG.md) for detailed information on the configuration options.
+
+3. Run a single iteration for testing:
+   ```
+   python parrot.py <path/config.json>
+   ```
+
+4. Run multiple iterations with logging using the bash script:
+   ```
+   ./parrot.sh <number_of_iterations> <path/config.json>
+   ```
+   Results will be written to `<parrot_date_time>/`
+
+5. Analyze the results
+   ```
+   python analyze.py <parrot_date_time>
+   ```
+
+6. Visualize and compare up to 10 runs
+   ```
+   python view.py <parrot_date_time0> <parrot_date_time1> ... <parrot_date_time9>
+   ```
+
+   A web browser will open to display `results.html`.
+
+## Configuration
+
+The `config.json` file allows you to customize various aspects of the dialogue generation, including:
+
+- Initial conversation prompts
+- Character prefixes
+- Token limits
+- Sampling parameters
+- API endpoints
+- User simulation settings
+
+For a complete breakdown of the configuration options, please refer to [CONFIG.md](CONFIG.md).
 
 ## Design Evolution
 
@@ -50,54 +111,6 @@ In addition to Loops, some Breaks have also been identified:
 - Apostrophe breaks: LLM starts to freak out whenever an ' is encountered, ending generations early or otherwise generating nonsense
 - Leading whitespace: LLM accumulates more and more whitespace before it starts to respond
 - Rejection: LLM decides the material is too hot and begins explicitly rejecting completions.
-
-## Components
-
-1. `parrot.py`: The main Python script that handles the dialogue generation.
-2. `parrot.sh`: A Bash script for running multiple iterations of the dialogue generation and logging the results.
-3. `config.json`: Configuration file for setting up the dialogue parameters.
-4. `analyze.py`: A python script to parse parrot logs and identify common segments in assistant speech and compute metrics.
-5. `view.py`: A streamlit application to visualize and compare results between multiple runs.
-
-## Usage
-
-1. Launch an inference engine for each of the two LLMs.
-
-For `llama-server` specify the desired context size with `-c <ctx>`
-
-For `aphrodite-engine` or `vLLM` specify the context size with `--max-model-len <ctx>`
-
-2. Set up your configuration in `config.json`. Refer to [CONFIG.md](CONFIG.md) for detailed information on the configuration options.
-
-3. Run a single iteration for testing:
-   ```
-   python parrot.py
-   ```
-
-4. Run multiple iterations with logging using the bash script:
-   ```
-   ./parrot.sh <number_of_iterations>
-   ```
-
-## Configuration
-
-The `config.json` file allows you to customize various aspects of the dialogue generation, including:
-
-- Initial conversation prompts
-- Character prefixes
-- Token limits
-- Sampling parameters
-- API endpoints
-- User simulation settings
-
-For a complete breakdown of the configuration options, please refer to [CONFIG.md](CONFIG.md).
-
-## Requirements
-
-- Python 3.x
-- `requests` library
-- `transformers` library
-- Access to language model APIs (as specified in the configuration)
 
 ## License
 
