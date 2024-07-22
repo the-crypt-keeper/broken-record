@@ -90,7 +90,7 @@ For a complete breakdown of the configuration options, please refer to [CONFIG.m
 - this revealed a new problem: after ~4k most models forget how to emit EOS and the conversation breaks down into romance novel word soup
 - parrot v1.3 limited each turn to a single line which keeps the conversation format flowing
 
-The current design is able to generate coherent ~8k token conversations.
+The current design is able to generate coherent 8k-16k token conversations.
 
 ## Looping and Breaking
 
@@ -111,6 +111,15 @@ In addition to Loops, some Breaks have also been identified:
 - Apostrophe breaks: LLM starts to freak out whenever an ' is encountered, ending generations early or otherwise generating nonsense
 - Leading whitespace: LLM accumulates more and more whitespace before it starts to respond
 - Rejection: LLM decides the material is too hot and begins explicitly rejecting completions.
+
+## References
+
+- [CTRL paper that describes repeat_penalty sampling](https://arxiv.org/pdf/1909.05858) see section 4.1
+- [OpenAI explanation of penalties](https://platform.openai.com/docs/advanced-usage/parameter-details) note that they do not support repeat_penalty
+- [aphrodite-engine implementation of penalties](https://github.com/PygmalionAI/aphrodite-engine/blob/cc6c310e578c63f594bb13d6125e6ed1ba8a208e/aphrodite/modeling/layers/sampler.py#L188)
+- [aphrodite-engine sampler](https://github.com/PygmalionAI/aphrodite-engine/blob/cc6c310e578c63f594bb13d6125e6ed1ba8a208e/aphrodite/modeling/layers/sampler.py#L44)
+- [llama-cpp implementation of penalties](https://github.com/ggerganov/llama.cpp/blob/45f2c19cc57286eead7b232ce8028273a817aa4d/src/llama.cpp)
+- [llama-cpp sampler](https://github.com/ggerganov/llama.cpp/blob/45f2c19cc57286eead7b232ce8028273a817aa4d/common/sampling.cpp#L354)
 
 ## License
 

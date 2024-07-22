@@ -1,0 +1,4 @@
+requests
+transformers
+bokeh
+matplotlib
