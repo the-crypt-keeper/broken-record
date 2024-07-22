@@ -109,7 +109,7 @@ if __name__ == "__main__":
 
         print()
         print(config['user_prefix'], end='')
-        user_text, tokens, _, _ = stream_response(user_llm, user_prompt, config.get('sampler'), config.get('turn_max_tokens', 512))        
+        user_text, tokens, _, _ = stream_response(user_llm, user_prompt, config.get('user_sampler', config.get('sampler')), config.get('turn_max_tokens', 512))        
 
         token_counts.append(tokens)
         conversation += [{"role": "user", "content": config["user_prefix"] + user_text}]

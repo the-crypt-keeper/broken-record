@@ -14,15 +14,15 @@ def create_length_histogram(lengths):
     
     buckets = OrderedDict([
         ((0, 1), 0),
-        *[((i * 100, (i + 1) * 100), 0) for i in range(10)],
-        ((1000, float('inf')), 0)
+        *[((i * 100, (i + 1) * 100), 0) for i in range(20)],
+        ((2000, float('inf')), 0)
     ])
     
     for length in lengths:
         if length <= 1:
             buckets[(0, 1)] += 1
-        elif length > 1000:
-            buckets[(1000, float('inf'))] += 1
+        elif length > 2000:
+            buckets[(2000, float('inf'))] += 1
         else:
             bucket_index = (length - 1) // 100
             bucket_key = list(buckets.keys())[bucket_index + 1]  # +1 to account for the 0-1 bucket
