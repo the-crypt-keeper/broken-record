@@ -51,7 +51,7 @@ def stream_response(llm, prompt, sampler, max_tokens = 2048):
                             stop = json_data['stop']
                         elif 'choices' in json_data:
                             fragment = json_data['choices'][0]['text']
-                            stop = json_data['choices'][0]['stop_reason'] is not None
+                            stop = json_data['choices'][0].get('stop_reason') is not None
                         else:
                             print(f"Error: {json_data}")
                             
