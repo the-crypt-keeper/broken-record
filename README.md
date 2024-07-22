@@ -1,10 +1,14 @@
-# Parrot: Synthetic Deep-Roleplay Dialogue Generation Tool
+# Broken Record Parrot
+
+![Broken Record Parrot](img/broken_record_parrot.png "A parrot sitting on a turntable, chewing on a record")
 
 ## Overview
 
-Parrot is a powerful tool designed for generating synthetic deep-roleplay dialogues using advanced language models.
+Parrot is a powerful tool designed for the generation and analysis of synthetic deep-roleplay dialogue with LLMs.
 
-It simulates a conversation between two characters, the results powering an investigation into LLM multi-turn conversation looping behaviors.
+Put simply: Parrot arbitrates an arbitrarily long conversation between two characters.
+
+The results are used to drive an investigation into various LLM multi-turn conversation looping behaviors.
 
 Tested up to 16K token, 100+ turn conversations.
 
