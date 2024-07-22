@@ -1,7 +1,5 @@
-| | |
-| --- | --- |
 | ![Broken Record Parrot](img/broken_record_parrot.png "A parrot sitting on a turntable, chewing on a record") | <h2>Broken Record Parrot</h2>Parrot is a tool designed for the generation and analysis of synthetic deep-roleplay dialogue with LLMs.<br><br>Put simply: Parrot creates long conversations between two characters.<br><br>The results are used to drive an investigation into various LLM multi-turn conversation looping behaviors.<br><br>Tested up to 16K token, 100+ turn conversations. |
-
+| --- | --- |
 
 ## Features
 
