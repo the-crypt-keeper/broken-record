@@ -21,7 +21,7 @@
 2. `parrot.sh`: A Bash script for running multiple iterations of the dialogue generation and logging the results.
 3. `config.json`: Configuration file for setting up the dialogue parameters.
 4. `analyze.py`: A python script to parse parrot logs and identify common segments in assistant speech and compute metrics.
-5. `view.py`: A streamlit application to visualize and compare results between multiple runs.
+5. `view.py`: Output a bokeh application to visualize and compare results between multiple runs.
 
 ## Usage
 
@@ -113,6 +113,7 @@ In addition to Loops, some Breaks have also been identified:
 - [aphrodite-engine sampler](https://github.com/PygmalionAI/aphrodite-engine/blob/cc6c310e578c63f594bb13d6125e6ed1ba8a208e/aphrodite/modeling/layers/sampler.py#L44)
 - [llama-cpp implementation of penalties](https://github.com/ggerganov/llama.cpp/blob/45f2c19cc57286eead7b232ce8028273a817aa4d/src/llama.cpp)
 - [llama-cpp sampler](https://github.com/ggerganov/llama.cpp/blob/45f2c19cc57286eead7b232ce8028273a817aa4d/common/sampling.cpp#L354)
+- [llama-cpp order of processors](https://github.com/ggerganov/llama.cpp/blob/master/common/sampling.h#L45)
 
 ## License
 
