@@ -17,19 +17,19 @@
 
 ## Components
 
-1. `parrot.py`: The main Python script that handles the dialogue generation.
-2. `parrot.sh`: A Bash script for running multiple iterations of the dialogue generation and logging the results.
-3. `config.json`: Configuration file for setting up the dialogue parameters.
-4. `analyze.py`: A python script to parse parrot logs and identify common segments in assistant speech and compute metrics.
-5. `view.py`: Output a bokeh application to visualize and compare results between multiple runs.
+- `parrot.py`: The main Python script that handles the dialogue generation.
+- `parrot.sh`: A Bash script for running multiple iterations of the dialogue generation and logging the results.
+- `config.json`: Configuration file for setting up the dialogue parameters.
+- `analyze.py`: A python script to parse parrot logs and identify common segments in assistant speech and compute metrics.
+- `view.py`: Output a bokeh application to visualize and compare results between multiple runs.
 
 ## Usage
 
 1. Launch an inference engine for each of the two LLMs.
 
-For `llama-server` specify the desired context size with `-c <ctx>`
+   For `llama-server` specify the desired context size with `-c <ctx>`
 
-For `aphrodite-engine` or `vLLM` specify the context size with `--max-model-len <ctx>`
+   For `aphrodite-engine` or `vLLM` specify the context size with `--max-model-len <ctx>`
 
 2. Set up your configuration in `config.json`. Refer to [CONFIG.md](CONFIG.md) for detailed information on the configuration options.
 
