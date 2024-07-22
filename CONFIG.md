@@ -4,6 +4,10 @@
 
 - `conversation`: An array of initial conversation messages to start the dialogue.
 - `agent_prefix`: The prefix used for the AI assistant's responses.
+
+## Token Limits
+
+- `initial_tokens`: Number of tokens in the initial conversation.
 - `total_tokens`: The maximum number of tokens for the entire conversation.
 - `turn_max_tokens`: The maximum number of tokens per turn.
 
@@ -13,11 +17,10 @@ The `sampler` object contains parameters for text generation:
 
 - `temperature`: Controls randomness in generation. Higher values make output more random.
 - `top_p`: Nucleus sampling parameter. Lower values make output more focused.
-- `repeat_penalty`: Penalizes repetition in generated text.
-- `repeat_last_n`: Number of tokens to consider for repeat penalty.
+- `repetition_penalty`: Penalizes repetition in generated text (vllm/aphrodite-engine server)
+- `repeat_penalty`: Penalizes repetition in generated text (llama.cpp server)
+- `repeat_last_n`: Number of tokens to consider for repeat penalty (llama.cpp server)
 - `stop`: Array of strings that will stop generation when encountered.
-- `top_k`: Limits vocabulary to top k tokens. 0 means no limit.
-- `min_p`: Minimum probability for a token to be considered.
 
 ## API and Model Settings
 
@@ -31,6 +34,7 @@ The `sampler` object contains parameters for text generation:
 - `user_prefix`: The prefix used for user responses.
 - `user_system`: The system prompt for user simulation.
 - `user_memory`: The number of recent messages to include in user context.
+- `user_sampler`: Sampling parameters for user (defaults to `sampler`)
 
 ## Example
 
