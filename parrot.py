@@ -5,7 +5,7 @@ import sys
 import random
 from transformers import AutoTokenizer
 
-def stream_response(llm, prompt, sampler, max_tokens = 2048):
+def stream_response(llm, prompt, sampler, max_tokens = 2048, echo = True):
     data = {
         "model": llm['model'],
         "n": 1,
@@ -16,6 +16,9 @@ def stream_response(llm, prompt, sampler, max_tokens = 2048):
         "cache_prompt": True,
         **sampler
     }
+    if not echo:
+        del data['n_predict']
+        del data['cache_prompt']
     
     completion = ''
     tokens = 0
@@ -53,18 +56,19 @@ def stream_response(llm, prompt, sampler, max_tokens = 2048):
                             fragment = json_data['choices'][0]['text']
                             stop = json_data['choices'][0].get('stop_reason') is not None
                         else:
-                            print(f"Error: {json_data}")
+                            print(f"Stream Error: {json_data}")
                             
                         completion += fragment
-                        print(fragment, end='')
-                        sys.stdout.flush()
+                        if echo:
+                            print(fragment, end='')
+                            sys.stdout.flush()
                         tokens += 1
                         if first_token_time is None: first_token_time = time.time()
                         
                         if stop: break                            
                         
     except requests.exceptions.RequestException as e:
-        print(f"Error: {e}")
+        print(f"Request Error: {e}")
         
     ttfs = first_token_time-req_start_time if (first_token_time is not None) and (req_start_time is not None) else None
     elapsed = time.time()-first_token_time if first_token_time is not None else None
@@ -117,6 +121,8 @@ if __name__ == "__main__":
     total_tokens = 0
     print()
     print("--- DONE ---")
+    print("Full Config:")
+    print(json.dumps(config))
     print(f"Assistant Model: {llm.get('model')}")
     print(f"User Model: {user_llm.get('model')}")    
     print()

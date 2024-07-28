@@ -7,6 +7,9 @@ import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import matplotlib.pyplot as plt
 import json
+from transformers import AutoTokenizer
+from parrot import stream_response
+import requests
 
 def create_length_histogram(lengths):
     if not lengths:
@@ -55,18 +58,18 @@ def extract_skye_lines(filename):
         # Remove "Skye:" from the beginning of each line and get individual response lengths
         response_lengths = []
         cleaned_lines = []
-        character_count = 0
+
         for line in skye_lines:
             cleaned_line = re.sub(r"^Skye:", "", line).strip()
             response_lengths.append(len(cleaned_line))
             if cleaned_line == "": cleaned_line = "[empty]"
             cleaned_lines.append(cleaned_line)
-            character_count += len(cleaned_line)
+
         
         # Join all the lines into a single text block
         skye_text = ' '.join(cleaned_lines)
         
-        return skye_text.strip(), character_count, response_lengths
+        return skye_text.strip(), lines[done_index+1:], response_lengths
     except Exception as e:
         print(f"Error processing file {filename}: {str(e)}")
         return "", 0
@@ -104,11 +107,65 @@ def find_and_remove_ngrams(text, n):
 
     return list(ngram_counts.items()), text
 
+judge_tokenizer = AutoTokenizer.from_pretrained("microsoft/Phi-3-medium-128k-instruct")
+judge_llm = { 'api_url': 'http://100.109.96.89:8099' }
+judge_llm['model'] = requests.get(judge_llm['api_url']+'/v1/models').json()['data'][0]['id']
+
+def judge_conversation2(raw_lines, step = 5):
+    first_line = None
+    for idx, line in enumerate(raw_lines):
+        if line.startswith("=== assistant @"):
+            first_line = idx
+            break
+
+    SYSTEM_PROMPT = """The user will provide sections of a conversation between a couple on a date."""
+    INSTRUCT_PROMPT = """INSTRUCTION:
+Respond with a JSON object with three keys: `summary`, `topics` and `themes`.
+`summary` should be a brief summary of the exchange.
+`topics` and `themes` should be lists of single words."""
+    
+    lines = [x for x in raw_lines[first_line+1:] if not x[0:3] in ["---","==="] and x.strip() != '']
+    topics = {}
+    replies = []
+         
+    for idx in range(0, len(lines), step):
+        chunk_text = '\n'.join(lines[idx:idx+step])
+        messages = [{ "role": "system", "content": SYSTEM_PROMPT }]        
+        messages.append({'role': 'user', 'content': chunk_text+INSTRUCT_PROMPT})
+        prompt = judge_tokenizer.apply_chat_template(messages, bos_token='', tokenize=False, add_generation_prompt=True)
+        summary_text, _, _, _ = stream_response(judge_llm, prompt, { 'temperature': 0.0, "repetition_penalty": 1.1, "top_p": 0.8 }, 1024, False)
+        
+        try:
+            left_bracket = summary_text.find('{')
+            right_bracket = summary_text.rfind('}')
+            data = json.loads(summary_text[left_bracket:right_bracket+1])
+            replies.append(data)
+            for k,v in data.items():
+                if k not in ['topics','themes']: continue
+                for item in v:
+                    if item not in topics: topics[item] = 0
+                    topics[item]+= 1
+        except Exception as e:
+            print("ERROR:", str(e))
+            print(summary_text)
+
+    return topics, replies
+
+def top_topics(topics):
+    topics_by_count = sorted(topics.keys(), key=lambda x: topics[x], reverse=True)
+    for topic in topics_by_count:
+        count = topics[topic]
+        if count > 1:
+            print(f"{count} {topic}")
+
 def process_file(file_path):
     filename = os.path.basename(file_path)
-    text, character_count, response_lengths = extract_skye_lines(file_path)
+    text, raw_lines, response_lengths = extract_skye_lines(file_path)
+    character_count = sum(response_lengths)
     if not text:
         return None
+    
+    topics, replies = judge_conversation2(raw_lines)
 
     all_ngrams = []
     for n in range(64, 4, -1):
@@ -120,7 +177,7 @@ def process_file(file_path):
     loop_density = loop_score / character_count if character_count > 0 else 0
 
     avg_response_length = sum(response_lengths) / len(response_lengths) if response_lengths else 0
-    return filename, character_count, loop_score, loop_density, sorted_ngrams, response_lengths, avg_response_length
+    return filename, character_count, loop_score, loop_density, sorted_ngrams, response_lengths, avg_response_length, topics, replies
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
@@ -157,6 +214,7 @@ if __name__ == "__main__":
     scatterplot_data = []
     
     log_files = [os.path.join(folder_path, f) for f in os.listdir(folder_path) if f.endswith('.log')]
+    log_files = sorted(log_files)
     
     lock = threading.Lock()
     
@@ -168,7 +226,7 @@ if __name__ == "__main__":
             try:
                 result = future.result()
                 if result:
-                    filename, character_count, loop_score, loop_density, sorted_ngrams, response_lengths, avg_response_length = result
+                    filename, character_count, loop_score, loop_density, sorted_ngrams, response_lengths, avg_response_length, topics, replies = result
                     
                     with lock:
                         print(f"\n{filename}")
@@ -190,6 +248,12 @@ if __name__ == "__main__":
                         
                         all_response_lengths.extend(response_lengths)
                         scatterplot_data.append((avg_response_length, loop_density))
+                        
+                        print("Summary:")
+                        for data in replies:
+                            print("- "+data['summary'])
+                        print("Top topics")
+                        top_topics(topics)
             except Exception as exc:
                 print(f'{file_path} generated an exception: {exc}')
 
